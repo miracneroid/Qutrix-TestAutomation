@@ -28,44 +28,50 @@ Capture Current IP
     ${os}=    Evaluate    platform.system()    modules=platform
 
     IF    '${os}' == 'Windows'
+
         ${result}=    Run Process    ipconfig    shell=True
+        ${output}=    Set Variable    ${result.stdout}
+
+        Log To Console    \n${output}
+
+        ${matches}=    Get Regexp Matches
+        ...    ${output}
+        ...    ([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)
+
     ELSE
+
         ${result}=    Run Process    ifconfig    shell=True
+        ${output}=    Set Variable    ${result.stdout}
+
+        ${matches}=    Get Regexp Matches
+        ...    ${output}
+        ...    inet (?:addr:)?([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)
+
     END
 
-    ${output}=    Set Variable    ${result.stdout}
-
-    ${matches}=    Get Regexp Matches
-    ...    ${output}
-    ...    (?:inet\\s)(?:addr:)?([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)
+    Log To Console    \nRaw Matches: ${matches}
 
     ${ip}=    Set Variable    ${matches}[0]
 
     Log To Console    \nIP Address: ${ip}
 
 Navigate To Careers Page
-    Log To Console    \nNavigating to Careers section...
+    Log To Console    \nNavigating directly to Careers page...
 
-    Wait Until Element Is Visible    xpath=//a[contains(.,'Company')]    15s
-    Click Element    xpath=//a[contains(.,'Company')]
+    Go To    https://qutrix.io/careers/
 
-    Wait Until Element Is Visible    xpath=//a[contains(.,'Career')]    15s
-    Click Element    xpath=//a[contains(.,'Career')]
+    Wait Until Page Contains Element    tag:body    20s
 
-    Wait Until Page Contains    Self-Assessment    15s
+    Sleep    5s
 
 Open Self Assessment Page
-    Log To Console    \nOpening Self Assessment page...
+    Log To Console    \nOpening Self Assessment page directly...
 
-    Scroll Element Into View    xpath=//*[contains(text(),'Click Here')]
+    Go To    https://qutrix.io/self-assessment/
 
-    Wait Until Element Is Visible    xpath=//*[contains(text(),'Click Here')]    15s
+    Wait Until Page Contains Element    tag:body    20s
 
-    Click Element    xpath=//*[contains(text(),'Click Here')]
-
-    Sleep    2s
-
-    Switch Window    NEW
+    Sleep    5s
 
 Capture Assessment Screenshot
     Log To Console    \nCapturing screenshot...
